@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const bodyparser = require("body-parser");
 const path = require("path");
 
+const connectDB = require('./server/database/connection')
+
 const app = express();
 
 dotenv.config({ path: "config.env" });
@@ -11,6 +13,8 @@ dotenv.config({ path: "config.env" });
 const PORT = process.env.PORT || 8080;
 
 app.use(morgan("tiny"));
+
+connectDB();
 
 app.use(bodyparser.urlencoded({ extended: true }));
 
@@ -21,14 +25,7 @@ app.use("/css", express.static(path.resolve(__dirname, "assets/css")));
 app.use("/img", express.static(path.resolve(__dirname, "assets/img")));
 app.use("/js", express.static(path.resolve(__dirname, "assets/js")));
 
-app.get("/", (req, res) => {
-  res.render("index.ejs");
-});
-
-
-app.get("/add-user", (req, res) => {
-  res.render("add_user.ejs");
-});
+app.use("/", require('./server/routes/router'))
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
